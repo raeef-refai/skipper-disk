@@ -161,9 +161,17 @@ module.exports = function buildDiskReceiverStream(options, adapter) {
 
       // Finally pipe the progress THROUGH the progress stream
       // and out to disk.
-      __newFile
-        .pipe(__progress__)
-        .pipe(outs__);
+      let res = __newFile
+        .pipe(__progress__);
+
+      if (_.isArray(options.pipes) && options.pipes.length) {
+        options.pipes.forEach(pipe => {
+          res = res
+            .pipe(pipe());
+        });
+      }
+
+      res.pipe(outs__);
 
     });
 
